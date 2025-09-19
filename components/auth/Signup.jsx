@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   Animated,
@@ -11,8 +12,8 @@ import {
   View,
 } from "react-native";
 import { createAccount } from "../../services/authService";
-
-export default function Signup(props) {
+export default function Signup() {
+  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +34,10 @@ export default function Signup(props) {
       }),
     ]).start();
   }, [fadeAnim, slideAnim]);
+
+  const onNavigateToLogin = () => {
+    navigation.navigate("Login");
+  };
 
   const handleSubmit = async () => {
     if (!email || !password) {
@@ -78,7 +83,19 @@ export default function Signup(props) {
             <View style={styles.headerSection}>
               <View style={styles.logoContainer}>
                 <View style={styles.logoCircle}>
-                  <Text style={styles.logoText}>C</Text>
+                  <View style={styles.haircutLogo}>
+                    {/* Professional scissors logo */}
+                    <View style={styles.scissorsMain}>
+                      <View style={styles.scissorsTop}>
+                        <View style={styles.blade1} />
+                        <View style={styles.blade2} />
+                      </View>
+                      <View style={styles.scissorsBottom}>
+                        <View style={styles.handle1} />
+                        <View style={styles.handle2} />
+                      </View>
+                    </View>
+                  </View>
                 </View>
               </View>
               <Text style={styles.heading}>Create Account</Text>
@@ -100,7 +117,7 @@ export default function Signup(props) {
                     autoComplete="email"
                     keyboardType="email-address"
                     placeholder="Enter your email"
-                    placeholderTextColor="#6B7280"
+                    placeholderTextColor="#9CA3AF"
                     style={styles.input}
                     returnKeyType="next"
                   />
@@ -117,7 +134,7 @@ export default function Signup(props) {
                     autoCapitalize="none"
                     autoComplete="password-new"
                     placeholder="Create a strong password"
-                    placeholderTextColor="#6B7280"
+                    placeholderTextColor="#9CA3AF"
                     style={styles.input}
                     returnKeyType="go"
                     onSubmitEditing={handleSubmit}
@@ -154,7 +171,9 @@ export default function Signup(props) {
             <View style={styles.footerSection}>
               <Text style={styles.footerText}>
                 Already have an account?{" "}
-                <Text style={styles.linkText}>Sign In</Text>
+                <TouchableOpacity onPress={onNavigateToLogin}>
+                  <Text style={styles.linkText}>Sign In</Text>
+                </TouchableOpacity>
               </Text>
             </View>
           </View>
@@ -171,7 +190,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: "#0A0E1A",
+    backgroundColor: "#F8F9FA", // Light background
     alignItems: "center",
     justifyContent: "center",
     minHeight: "100%",
@@ -195,11 +214,11 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   card: {
-    backgroundColor: "#1A1F2E",
+    backgroundColor: "#FFFFFF", // White card
     borderRadius: 24,
     padding: 32,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
+    borderColor: "rgba(0,0,0,0.08)", // Light border for light theme
     overflow: "hidden",
   },
   headerSection: {
@@ -228,7 +247,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
   heading: {
-    color: "#FFFFFF",
+    color: "#1A1A1A", // Black text for light theme
     fontSize: 32,
     fontWeight: "800",
     letterSpacing: -0.5,
@@ -236,7 +255,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subheading: {
-    color: "#9CA3AF",
+    color: "#6C757D", // Darker gray for light theme
     fontSize: 16,
     textAlign: "center",
     lineHeight: 22,
@@ -248,7 +267,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    color: "#E5E7EB",
+    color: "#1A1A1A", // Black text for labels
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 8,
@@ -258,10 +277,10 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   input: {
-    backgroundColor: "#111827",
-    color: "#FFFFFF",
+    backgroundColor: "#FFFFFF", // White input background
+    color: "#1A1A1A", // Black text in inputs
     borderWidth: 1.5,
-    borderColor: "rgba(255,255,255,0.1)",
+    borderColor: "rgba(0,0,0,0.12)", // Dark border for light theme
     paddingHorizontal: 16,
     paddingVertical: Platform.select({ ios: 16, android: 12 }),
     borderRadius: 16,
@@ -314,7 +333,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   termsText: {
-    color: "#9CA3AF",
+    color: "#6C757D", // Darker gray for light theme
     fontSize: 13,
     textAlign: "center",
     lineHeight: 18,
@@ -323,10 +342,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.08)",
+    borderTopColor: "rgba(0,0,0,0.08)", // Dark border for light theme
   },
   footerText: {
-    color: "#9CA3AF",
+    color: "#6C757D", // Darker gray for light theme
     fontSize: 14,
   },
   linkText: {
