@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { loginAccount } from "../../services/authService";
 
-export default function Login(props) {
+export default function UserLogin(props) {
   const navigation = useNavigation();
   const { onSubmit, isSubmitting = false, errorMessage = null } = props;
 
@@ -43,7 +43,7 @@ export default function Login(props) {
   };
 
   const onNavigateToSignup = () => {
-    navigation.navigate("Signup");
+    navigation.navigate("UserSignup");
   };
 
   const handleGoogleSignIn = () => {
@@ -145,7 +145,7 @@ export default function Login(props) {
               </View>
 
               {/* Submit Button */}
-              <TouchableOpacity onPress={handleSubmit}>
+              <TouchableOpacity onPress={handleSubmit} style={styles.button}>
                 <View style={styles.buttonContent}>
                   {isSubmitting ? (
                     <View style={styles.loadingSpinner} />
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
   buttonContent: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "red",
+    backgroundColor: "transparent",
     justifyContent: "center",
   },
   buttonText: {

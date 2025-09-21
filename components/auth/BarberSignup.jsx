@@ -11,11 +11,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { createAccount } from "../../services/authService";
-export default function UserSignup() {
+import { createBarberAccount } from "../../services/authService";
+
+export default function BarberSignup() {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
@@ -36,21 +39,28 @@ export default function UserSignup() {
   }, [fadeAnim, slideAnim]);
 
   const onNavigateToLogin = () => {
-    navigation.navigate("UserLogin");
+    navigation.navigate("BarberLogin");
   };
 
   const handleSubmit = async () => {
-    if (!email || !password) {
+    if (!email || !password || !businessName || !phoneNumber) {
       alert("Please fill in all fields");
       return;
     }
 
     setIsLoading(true);
     try {
-      await createAccount({ user: { email, password } });
-      alert("Account created successfully");
+      await createBarberAccount({
+        barber: {
+          email,
+          password,
+          business_name: businessName,
+          phone_number: phoneNumber,
+        },
+      });
+      alert("Barber account created successfully");
     } catch (_error) {
-      alert("Failed to create account. Please try again.");
+      alert("Failed to create barber account. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -83,8 +93,8 @@ export default function UserSignup() {
             <View style={styles.headerSection}>
               <View style={styles.logoContainer}>
                 <View style={styles.logoCircle}>
-                  <View style={styles.haircutLogo}>
-                    {/* Professional scissors logo */}
+                  <View style={styles.barberLogo}>
+                    {/* Barber scissors logo */}
                     <View style={styles.scissorsMain}>
                       <View style={styles.scissorsTop}>
                         <View style={styles.blade1} />
@@ -98,14 +108,29 @@ export default function UserSignup() {
                   </View>
                 </View>
               </View>
-              <Text style={styles.heading}>Create Account</Text>
+              <Text style={styles.heading}>Join as Barber</Text>
               <Text style={styles.subheading}>
-                Join Cutzy and start your journey
+                Create your barber account and start accepting bookings
               </Text>
             </View>
 
             {/* Form Section */}
             <View style={styles.formSection}>
+              <View style={styles.fieldGroup}>
+                <Text style={styles.label}>Business Name</Text>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    value={businessName}
+                    onChangeText={setBusinessName}
+                    autoCapitalize="words"
+                    placeholder="Enter your salon/barbershop name"
+                    placeholderTextColor="#9CA3AF"
+                    style={styles.input}
+                    returnKeyType="next"
+                  />
+                </View>
+              </View>
+
               <View style={styles.fieldGroup}>
                 <Text style={styles.label}>Email Address</Text>
                 <View style={styles.inputContainer}>
@@ -117,6 +142,22 @@ export default function UserSignup() {
                     autoComplete="email"
                     keyboardType="email-address"
                     placeholder="Enter your email"
+                    placeholderTextColor="#9CA3AF"
+                    style={styles.input}
+                    returnKeyType="next"
+                  />
+                </View>
+              </View>
+
+              <View style={styles.fieldGroup}>
+                <Text style={styles.label}>Phone Number</Text>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    value={phoneNumber}
+                    onChangeText={setPhoneNumber}
+                    inputMode="tel"
+                    keyboardType="phone-pad"
+                    placeholder="Enter your phone number"
                     placeholderTextColor="#9CA3AF"
                     style={styles.input}
                     returnKeyType="next"
@@ -152,7 +193,7 @@ export default function UserSignup() {
                   {isLoading ? (
                     <View style={styles.loadingSpinner} />
                   ) : (
-                    <Text style={styles.buttonText}>Create Account</Text>
+                    <Text style={styles.buttonText}>Create Barber Account</Text>
                   )}
                 </View>
               </TouchableOpacity>
@@ -160,7 +201,7 @@ export default function UserSignup() {
               {/* Terms and Privacy */}
               <View style={styles.termsSection}>
                 <Text style={styles.termsText}>
-                  By creating an account, you agree to our{" "}
+                  By creating a barber account, you agree to our{" "}
                   <Text style={styles.linkText}>Terms of Service</Text> and{" "}
                   <Text style={styles.linkText}>Privacy Policy</Text>
                 </Text>
@@ -170,7 +211,7 @@ export default function UserSignup() {
             {/* Footer */}
             <View style={styles.footerSection}>
               <Text style={styles.footerText}>
-                Already have an account?{" "}
+                Already have a barber account?{" "}
                 <TouchableOpacity onPress={onNavigateToLogin}>
                   <Text style={styles.linkText}>Sign In</Text>
                 </TouchableOpacity>
@@ -190,7 +231,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: "#F8F9FA", // Light background
+    backgroundColor: "#F8F9FA",
     alignItems: "center",
     justifyContent: "center",
     minHeight: "100%",
@@ -214,11 +255,11 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   card: {
-    backgroundColor: "#FFFFFF", // White card
+    backgroundColor: "#FFFFFF",
     borderRadius: 24,
     padding: 32,
     borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.08)", // Light border for light theme
+    borderColor: "rgba(0,0,0,0.08)",
     overflow: "hidden",
   },
   headerSection: {
@@ -232,22 +273,70 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "#667eea",
+    backgroundColor: "#10B981", // Green color for barber
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#667eea",
+    shadowColor: "#10B981",
     shadowOpacity: 0.3,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 8,
   },
-  logoText: {
-    color: "#FFFFFF",
-    fontSize: 24,
-    fontWeight: "800",
+  barberLogo: {
+    width: 30,
+    height: 30,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scissorsMain: {
+    width: 20,
+    height: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scissorsTop: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+  blade1: {
+    width: 8,
+    height: 2,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 1,
+    transform: [{ rotate: "15deg" }],
+  },
+  blade2: {
+    width: 8,
+    height: 2,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 1,
+    transform: [{ rotate: "-15deg" }],
+    marginLeft: -2,
+  },
+  scissorsBottom: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  handle1: {
+    width: 6,
+    height: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 3,
+    transform: [{ rotate: "15deg" }],
+  },
+  handle2: {
+    width: 6,
+    height: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 3,
+    transform: [{ rotate: "-15deg" }],
+    marginLeft: -2,
   },
   heading: {
-    color: "#1A1A1A", // Black text for light theme
+    color: "#1A1A1A",
     fontSize: 32,
     fontWeight: "800",
     letterSpacing: -0.5,
@@ -255,7 +344,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subheading: {
-    color: "#6C757D", // Darker gray for light theme
+    color: "#6C757D",
     fontSize: 16,
     textAlign: "center",
     lineHeight: 22,
@@ -267,7 +356,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    color: "#1A1A1A", // Black text for labels
+    color: "#1A1A1A",
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 8,
@@ -277,10 +366,10 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   input: {
-    backgroundColor: "#FFFFFF", // White input background
-    color: "#1A1A1A", // Black text in inputs
+    backgroundColor: "#FFFFFF",
+    color: "#1A1A1A",
     borderWidth: 1.5,
-    borderColor: "rgba(0,0,0,0.12)", // Dark border for light theme
+    borderColor: "rgba(0,0,0,0.12)",
     paddingHorizontal: 16,
     paddingVertical: Platform.select({ ios: 16, android: 12 }),
     borderRadius: 16,
@@ -294,12 +383,12 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 8,
-    backgroundColor: "#667eea",
+    backgroundColor: "#10B981", // Green color for barber
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 16,
-    shadowColor: "#667eea",
+    shadowColor: "#10B981",
     shadowOpacity: 0.3,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
@@ -333,7 +422,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   termsText: {
-    color: "#6C757D", // Darker gray for light theme
+    color: "#6C757D",
     fontSize: 13,
     textAlign: "center",
     lineHeight: 18,
@@ -342,14 +431,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.08)", // Dark border for light theme
+    borderTopColor: "rgba(0,0,0,0.08)",
   },
   footerText: {
-    color: "#6C757D", // Darker gray for light theme
+    color: "#6C757D",
     fontSize: 14,
   },
   linkText: {
-    color: "#667eea",
+    color: "#10B981", // Green color for barber
     fontWeight: "600",
   },
 });
