@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { loginAccount } from "../../services/authService";
+import { loginAccount } from "../../../services/authService";
 
 export default function UserLogin(props) {
   const navigation = useNavigation();
@@ -38,8 +38,25 @@ export default function UserLogin(props) {
   }, [fadeAnim, slideAnim]);
 
   const handleSubmit = async () => {
-    const res = await loginAccount({ user: { email, password } });
-    console.log(res);
+    if (!email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    try {
+      const res = await loginAccount({ user: { email, password } });
+      console.log("User login successful:", res);
+
+      // Clear form fields
+      setEmail("");
+      setPassword("");
+
+      // Navigate to customer dashboard
+      navigation.navigate("CustomerDashboard");
+    } catch (error) {
+      console.log("User login error:", error);
+      alert("Failed to login. Please check your credentials.");
+    }
   };
 
   const onNavigateToSignup = () => {

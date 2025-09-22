@@ -11,9 +11,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { loginBarberAccount } from "../../services/authService";
-
-export default function BarberLogin() {
+import { createAccount } from "../../../services/authService";
+export default function UserSignup() {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,32 +35,27 @@ export default function BarberLogin() {
     ]).start();
   }, [fadeAnim, slideAnim]);
 
-  const onNavigateToSignup = () => {
-    navigation.navigate("BarberSignup");
+  const onNavigateToLogin = () => {
+    navigation.navigate("UserLogin");
   };
 
   const handleSubmit = async () => {
     if (!email || !password) {
       alert("Please fill in all fields");
+      setEmail("");
+      setPassword("");
       return;
     }
 
     setIsLoading(true);
     try {
-      const res = await loginBarberAccount({ barber: { email, password } });
-      console.log("Barber login successful:", res);
-      alert("Login successful!");
-    } catch (error) {
-      console.log("Barber login error:", error);
-      alert("Failed to login. Please check your credentials.");
+      await createAccount({ user: { email, password } });
+      alert("Account created successfully");
+    } catch (_error) {
+      alert("Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleGoogleSignIn = () => {
-    // TODO: Implement Google Sign-In for barbers
-    console.log("Google Sign-In clicked for barber");
   };
 
   return (
@@ -91,8 +85,8 @@ export default function BarberLogin() {
             <View style={styles.headerSection}>
               <View style={styles.logoContainer}>
                 <View style={styles.logoCircle}>
-                  <View style={styles.barberLogo}>
-                    {/* Barber scissors logo */}
+                  <View style={styles.haircutLogo}>
+                    {/* Professional scissors logo */}
                     <View style={styles.scissorsMain}>
                       <View style={styles.scissorsTop}>
                         <View style={styles.blade1} />
@@ -106,9 +100,9 @@ export default function BarberLogin() {
                   </View>
                 </View>
               </View>
-              <Text style={styles.heading}>Barber Login</Text>
+              <Text style={styles.heading}>Create Account</Text>
               <Text style={styles.subheading}>
-                Sign in to manage your salon and bookings
+                Join Cutzy and start your journey
               </Text>
             </View>
 
@@ -140,8 +134,8 @@ export default function BarberLogin() {
                     onChangeText={setPassword}
                     secureTextEntry
                     autoCapitalize="none"
-                    autoComplete="password"
-                    placeholder="Enter your password"
+                    autoComplete="password-new"
+                    placeholder="Create a strong password"
                     placeholderTextColor="#9CA3AF"
                     style={styles.input}
                     returnKeyType="go"
@@ -160,40 +154,27 @@ export default function BarberLogin() {
                   {isLoading ? (
                     <View style={styles.loadingSpinner} />
                   ) : (
-                    <Text style={styles.buttonText}>Sign In as Barber</Text>
+                    <Text style={styles.buttonText}>Create Account</Text>
                   )}
                 </View>
               </TouchableOpacity>
 
-              {/* Divider */}
-              <View style={styles.dividerContainer}>
-                <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>or</Text>
-                <View style={styles.dividerLine} />
+              {/* Terms and Privacy */}
+              <View style={styles.termsSection}>
+                <Text style={styles.termsText}>
+                  By creating an account, you agree to our{" "}
+                  <Text style={styles.linkText}>Terms of Service</Text> and{" "}
+                  <Text style={styles.linkText}>Privacy Policy</Text>
+                </Text>
               </View>
-
-              {/* Google Sign-In Button */}
-              <TouchableOpacity
-                onPress={handleGoogleSignIn}
-                style={styles.googleButton}
-              >
-                <View style={styles.googleButtonContent}>
-                  <View style={styles.googleIcon}>
-                    <Text style={styles.googleIconText}>G</Text>
-                  </View>
-                  <Text style={styles.googleButtonText}>
-                    Continue with Google
-                  </Text>
-                </View>
-              </TouchableOpacity>
             </View>
 
             {/* Footer */}
             <View style={styles.footerSection}>
               <Text style={styles.footerText}>
-                Don't have a barber account?{" "}
-                <TouchableOpacity onPress={onNavigateToSignup}>
-                  <Text style={styles.linkText}>Sign Up</Text>
+                Already have an account?{" "}
+                <TouchableOpacity onPress={onNavigateToLogin}>
+                  <Text style={styles.linkText}>Sign In</Text>
                 </TouchableOpacity>
               </Text>
             </View>
@@ -211,7 +192,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#F8F9FA", // Light background
     alignItems: "center",
     justifyContent: "center",
     minHeight: "100%",
@@ -235,11 +216,11 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#FFFFFF", // White card
     borderRadius: 24,
     padding: 32,
     borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.08)",
+    borderColor: "rgba(0,0,0,0.08)", // Light border for light theme
     overflow: "hidden",
   },
   headerSection: {
@@ -253,70 +234,22 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "#10B981", // Green color for barber
+    backgroundColor: "#667eea",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#10B981",
+    shadowColor: "#667eea",
     shadowOpacity: 0.3,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 8,
   },
-  barberLogo: {
-    width: 30,
-    height: 30,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  scissorsMain: {
-    width: 20,
-    height: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  scissorsTop: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 2,
-  },
-  blade1: {
-    width: 8,
-    height: 2,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 1,
-    transform: [{ rotate: "15deg" }],
-  },
-  blade2: {
-    width: 8,
-    height: 2,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 1,
-    transform: [{ rotate: "-15deg" }],
-    marginLeft: -2,
-  },
-  scissorsBottom: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  handle1: {
-    width: 6,
-    height: 8,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 3,
-    transform: [{ rotate: "15deg" }],
-  },
-  handle2: {
-    width: 6,
-    height: 8,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 3,
-    transform: [{ rotate: "-15deg" }],
-    marginLeft: -2,
+  logoText: {
+    color: "#FFFFFF",
+    fontSize: 24,
+    fontWeight: "800",
   },
   heading: {
-    color: "#1A1A1A",
+    color: "#1A1A1A", // Black text for light theme
     fontSize: 32,
     fontWeight: "800",
     letterSpacing: -0.5,
@@ -324,7 +257,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subheading: {
-    color: "#6C757D",
+    color: "#6C757D", // Darker gray for light theme
     fontSize: 16,
     textAlign: "center",
     lineHeight: 22,
@@ -336,7 +269,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    color: "#1A1A1A",
+    color: "#1A1A1A", // Black text for labels
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 8,
@@ -346,10 +279,10 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   input: {
-    backgroundColor: "#FFFFFF",
-    color: "#1A1A1A",
+    backgroundColor: "#FFFFFF", // White input background
+    color: "#1A1A1A", // Black text in inputs
     borderWidth: 1.5,
-    borderColor: "rgba(0,0,0,0.12)",
+    borderColor: "rgba(0,0,0,0.12)", // Dark border for light theme
     paddingHorizontal: 16,
     paddingVertical: Platform.select({ ios: 16, android: 12 }),
     borderRadius: 16,
@@ -363,12 +296,12 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 8,
-    backgroundColor: "#10B981", // Green color for barber
+    backgroundColor: "#667eea",
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 16,
-    shadowColor: "#10B981",
+    shadowColor: "#667eea",
     shadowOpacity: 0.3,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
@@ -397,73 +330,28 @@ const styles = StyleSheet.create({
     borderColor: "#FFFFFF",
     borderTopColor: "transparent",
   },
-  dividerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 24,
+  termsSection: {
+    marginTop: 20,
+    paddingHorizontal: 8,
   },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "rgba(0,0,0,0.12)",
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: "#6C757D",
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  googleButton: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.5,
-    borderColor: "rgba(0,0,0,0.12)",
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
-  },
-  googleButtonContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  googleIcon: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#4285F4",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  googleIconText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  googleButtonText: {
-    color: "#1A1A1A",
-    fontSize: 16,
-    fontWeight: "600",
-    letterSpacing: 0.2,
+  termsText: {
+    color: "#6C757D", // Darker gray for light theme
+    fontSize: 13,
+    textAlign: "center",
+    lineHeight: 18,
   },
   footerSection: {
     alignItems: "center",
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.08)",
+    borderTopColor: "rgba(0,0,0,0.08)", // Dark border for light theme
   },
   footerText: {
-    color: "#6C757D",
+    color: "#6C757D", // Darker gray for light theme
     fontSize: 14,
   },
   linkText: {
-    color: "#10B981", // Green color for barber
+    color: "#667eea",
     fontWeight: "600",
   },
 });

@@ -11,14 +11,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { createBarberAccount } from "../../services/authService";
+import { loginBarberAccount } from "../../../services/authService";
 
-export default function BarberSignup() {
+export default function BarberLogin() {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [businessName, setBusinessName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
@@ -38,32 +36,38 @@ export default function BarberSignup() {
     ]).start();
   }, [fadeAnim, slideAnim]);
 
-  const onNavigateToLogin = () => {
-    navigation.navigate("BarberLogin");
+  const onNavigateToSignup = () => {
+    navigation.navigate("BarberSignup");
   };
 
   const handleSubmit = async () => {
-    if (!email || !password || !businessName || !phoneNumber) {
+    if (!email || !password) {
       alert("Please fill in all fields");
       return;
     }
 
     setIsLoading(true);
     try {
-      await createBarberAccount({
-        barber: {
-          email,
-          password,
-          business_name: businessName,
-          phone_number: phoneNumber,
-        },
-      });
-      alert("Barber account created successfully");
-    } catch (_error) {
-      alert("Failed to create barber account. Please try again.");
+      const res = await loginBarberAccount({ barber: { email, password } });
+      console.log("Barber login successful:", res);
+
+      // Clear form fields
+      setEmail("");
+      setPassword("");
+
+      // Navigate to barber dashboard
+      navigation.navigate("BarberDashboard");
+    } catch (error) {
+      console.log("Barber login error:", error);
+      alert("Failed to login. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleSignIn = () => {
+    // TODO: Implement Google Sign-In for barbers
+    console.log("Google Sign-In clicked for barber");
   };
 
   return (
@@ -108,29 +112,14 @@ export default function BarberSignup() {
                   </View>
                 </View>
               </View>
-              <Text style={styles.heading}>Join as Barber</Text>
+              <Text style={styles.heading}>Barber Login</Text>
               <Text style={styles.subheading}>
-                Create your barber account and start accepting bookings
+                Sign in to manage your salon and bookings
               </Text>
             </View>
 
             {/* Form Section */}
             <View style={styles.formSection}>
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>Business Name</Text>
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    value={businessName}
-                    onChangeText={setBusinessName}
-                    autoCapitalize="words"
-                    placeholder="Enter your salon/barbershop name"
-                    placeholderTextColor="#9CA3AF"
-                    style={styles.input}
-                    returnKeyType="next"
-                  />
-                </View>
-              </View>
-
               <View style={styles.fieldGroup}>
                 <Text style={styles.label}>Email Address</Text>
                 <View style={styles.inputContainer}>
@@ -150,22 +139,6 @@ export default function BarberSignup() {
               </View>
 
               <View style={styles.fieldGroup}>
-                <Text style={styles.label}>Phone Number</Text>
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    value={phoneNumber}
-                    onChangeText={setPhoneNumber}
-                    inputMode="tel"
-                    keyboardType="phone-pad"
-                    placeholder="Enter your phone number"
-                    placeholderTextColor="#9CA3AF"
-                    style={styles.input}
-                    returnKeyType="next"
-                  />
-                </View>
-              </View>
-
-              <View style={styles.fieldGroup}>
                 <Text style={styles.label}>Password</Text>
                 <View style={styles.inputContainer}>
                   <TextInput
@@ -173,8 +146,8 @@ export default function BarberSignup() {
                     onChangeText={setPassword}
                     secureTextEntry
                     autoCapitalize="none"
-                    autoComplete="password-new"
-                    placeholder="Create a strong password"
+                    autoComplete="password"
+                    placeholder="Enter your password"
                     placeholderTextColor="#9CA3AF"
                     style={styles.input}
                     returnKeyType="go"
@@ -193,27 +166,40 @@ export default function BarberSignup() {
                   {isLoading ? (
                     <View style={styles.loadingSpinner} />
                   ) : (
-                    <Text style={styles.buttonText}>Create Barber Account</Text>
+                    <Text style={styles.buttonText}>Sign In as Barber</Text>
                   )}
                 </View>
               </TouchableOpacity>
 
-              {/* Terms and Privacy */}
-              <View style={styles.termsSection}>
-                <Text style={styles.termsText}>
-                  By creating a barber account, you agree to our{" "}
-                  <Text style={styles.linkText}>Terms of Service</Text> and{" "}
-                  <Text style={styles.linkText}>Privacy Policy</Text>
-                </Text>
+              {/* Divider */}
+              <View style={styles.dividerContainer}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>or</Text>
+                <View style={styles.dividerLine} />
               </View>
+
+              {/* Google Sign-In Button */}
+              <TouchableOpacity
+                onPress={handleGoogleSignIn}
+                style={styles.googleButton}
+              >
+                <View style={styles.googleButtonContent}>
+                  <View style={styles.googleIcon}>
+                    <Text style={styles.googleIconText}>G</Text>
+                  </View>
+                  <Text style={styles.googleButtonText}>
+                    Continue with Google
+                  </Text>
+                </View>
+              </TouchableOpacity>
             </View>
 
             {/* Footer */}
             <View style={styles.footerSection}>
               <Text style={styles.footerText}>
-                Already have a barber account?{" "}
-                <TouchableOpacity onPress={onNavigateToLogin}>
-                  <Text style={styles.linkText}>Sign In</Text>
+                Don't have a barber account?{" "}
+                <TouchableOpacity onPress={onNavigateToSignup}>
+                  <Text style={styles.linkText}>Sign Up</Text>
                 </TouchableOpacity>
               </Text>
             </View>
@@ -417,15 +403,60 @@ const styles = StyleSheet.create({
     borderColor: "#FFFFFF",
     borderTopColor: "transparent",
   },
-  termsSection: {
-    marginTop: 20,
-    paddingHorizontal: 8,
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 24,
   },
-  termsText: {
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "rgba(0,0,0,0.12)",
+  },
+  dividerText: {
+    marginHorizontal: 16,
     color: "#6C757D",
-    fontSize: 13,
-    textAlign: "center",
-    lineHeight: 18,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  googleButton: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1.5,
+    borderColor: "rgba(0,0,0,0.12)",
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  googleButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  googleIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "#4285F4",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  googleIconText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  googleButtonText: {
+    color: "#1A1A1A",
+    fontSize: 16,
+    fontWeight: "600",
+    letterSpacing: 0.2,
   },
   footerSection: {
     alignItems: "center",

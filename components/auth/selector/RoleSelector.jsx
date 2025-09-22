@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 24,
-    padding: 32,
+    padding: 10,
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.08)",
     overflow: "hidden",
@@ -345,5 +345,6 @@ const styles = StyleSheet.create({
   linkText: {
     color: "#667eea",
     fontWeight: "600",
+   
   },
 });
